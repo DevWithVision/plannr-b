@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
 const eventSchema = new mongoose.Schema({
   hostId: {
@@ -66,14 +67,22 @@ const eventSchema = new mongoose.Schema({
     unique: true,
     required: true
   },
+  category: {
+    type: String,
+    enum: ['Music', 'Conference', 'Workshop', 'Networking', 'Sports', 'Art', 'Food', 'Other'],
+    default: 'Other'
+  },
+  maxAttendees: {
+    type: Number
+  },
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
 
-// Generate public ID before saving
-eventSchema.pre('save', function(next) {
+// Generate public ID before validation
+eventSchema.pre('validate', function(next) {
   if (!this.publicId) {
     this.publicId = `EVENT${Date.now()}${Math.random().toString(36).substr(2, 9)}`;
   }
